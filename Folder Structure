@@ -1,0 +1,27 @@
+vishing_ai_demo/
+│
+├── app.py                         # Main Flask app
+├── requirements.txt               # Python dependencies
+├── README.md                      # Project overview
+│
+├── static/                        # CSS, JS, and other static files
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── main.js
+│
+├── templates/                     # HTML templates (Flask Jinja2)
+│   ├── index.html
+│   ├── upload.html
+│   ├── result.html
+│
+├── model/                         # ML model & scripts
+│   ├── audio_preprocess.py
+│   ├── train_model.py
+│   ├── predict_audio.py
+│   └── model.pkl
+│
+├── uploads/                       # Temporary folder for uploaded audio
+│
+└── utils/
+    └── feature_extraction.py

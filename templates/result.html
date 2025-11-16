@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Result - VishingAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      background: radial-gradient(circle at top, #0a0f1d, #060912 80%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #eaf1ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .result-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      box-shadow: 0 0 30px rgba(0, 100, 255, 0.2);
+      border-radius: 20px;
+      text-align: center;
+      padding: 40px 60px;
+      max-width: 480px;
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    .result-card h1 {
+      margin: 0 0 20px;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #9fb7ff;
+    }
+
+    .status {
+      margin: 20px auto;
+      font-size: 2rem;
+      font-weight: 700;
+      padding: 18px;
+      border-radius: 14px;
+      display: inline-block;
+      min-width: 250px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+      letter-spacing: 0.05em;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    /* ✅ Green glow for Genuine */
+    .status.genuine {
+      color: #00ffaa;
+      border: 2px solid #00ffaa;
+      box-shadow: 0 0 25px rgba(0, 255, 170, 0.4);
+    }
+
+    /* ⚠️ Red glow for Phishing */
+    .status.phishing {
+      color: #ff5c5c;
+      border: 2px solid #ff5c5c;
+      box-shadow: 0 0 25px rgba(255, 92, 92, 0.4);
+    }
+
+    .actions {
+      margin-top: 25px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-home {
+      background: #0059ff;
+    }
+
+    .btn-home:hover {
+      background: #007bff;
+      transform: translateY(-2px);
+    }
+
+    .btn-another {
+      background: #222b44;
+    }
+
+    .btn-another:hover {
+      background: #32456d;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <div class="result-card">
+    <h1>🎧 Audio Analysis Result</h1>
+
+    {% if result == "Phishing" %}
+      <div class="status phishing">⚠️ Phishing Detected</div>
+      <p style="color:#ff7b7b;">Be cautious! This audio contains signs of social engineering or deepfake manipulation.</p>
+    {% elif result == "Genuine" %}
+      <div class="status genuine">✅ Genuine Audio</div>
+      <p style="color:#9fffce;">This seems safe — no phishing traits detected in the audio.</p>
+    {% else %}
+      <div class="status">❔ {{ result }}</div>
+      <p style="color:#a8b3d6;">Unable to classify the audio file.</p>
+    {% endif %}
+
+    <div class="actions">
+      <a href="/" class="btn btn-home">🏠 Home</a>
+      <a href="/upload" class="btn btn-another">🎵 Analyze Another</a>
+    </div>
+  </div>
+</body>
+</html>

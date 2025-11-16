@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VishingAI Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* ===== General Layout ===== */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #0b0f19;
+      color: #eaf1ff;
+      overflow-x: hidden;
+    }
+
+    header.site-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 22px auto;
+      padding: 0 18px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    /* ===== Animated Gradient Title ===== */
+    .brand h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: transparent;
+      background: linear-gradient(270deg, #00d4ff, #0077ff, #5e17eb, #00ffa1);
+      background-size: 600% 600%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 6s ease infinite;
+      font-weight: 800;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #9fb7ff;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .small-btn {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #d0e2ff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .small-btn:hover {
+      background: rgba(0, 119, 255, 0.4);
+      transform: scale(1.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 26px;
+      align-items: start;
+      width: 100%;
+      max-width: 1200px;
+      margin: 10px auto 50px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 6px 20px rgba(2, 6, 23, 0.8);
+    }
+
+    .kpi-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .kpi {
+      flex: 1;
+      min-width: 180px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      text-align: left;
+    }
+
+    .kpi h3 {
+      margin: 0;
+      font-size: 12px;
+      color: #9fb7ff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi p {
+      margin: 6px 0 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .upload-quick {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .recent-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .recent-table th,
+    .recent-table td {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      color: #dfe9ff;
+    }
+
+    .recent-table thead th {
+      color: #9fb7ff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .tag-phish { color: #ff6666; font-weight: 700; }
+    .tag-good { color: #66ffaa; font-weight: 700; }
+
+    /* ===== Overlay Spinner ===== */
+    #trainingOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 12, 25, 0.92);
+      color: #fff;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      backdrop-filter: blur(5px);
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid #00b3ff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; padding: 0 14px; }
+      header.site-header { padding: 0 14px; flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div style="font-size: 34px;">🎙️</div>
+      <div>
+        <h1>VishingAI</h1>
+        <p>Voice Phishing Detection · Final Project</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div style="font-size: 0.9rem;">Model: <strong>{{ model_status }}</strong></div>
+      <div style="font-size: 0.9rem;">Samples: <strong>{{ num_samples or 0 }}</strong></div>
+      <button class="small-btn" onclick="location.href='{{ url_for('upload') }}'">Upload</button>
+      <button class="small-btn" onclick="window.location.reload()">Refresh</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <div class="kpi-row">
+        <div class="kpi">
+          <h3>Dataset size</h3>
+          <p>{{ num_samples or 0 }}</p>
+          <span style="font-size: 0.85rem; color: #9fb7ff;">Phishing + Genuine</span>
+        </div>
+        <div class="kpi">
+          <h3>Model accuracy</h3>
+          <p>{{ (model_accuracy ~ '%') if model_accuracy is not none else 'N/A' }}</p>
+        </div>
+        <div class="kpi">
+          <h3>Last trained</h3>
+          <p>{{ model_trained_time or '—' }}</p>
+        </div>
+      </div>
+
+      <h3 style="color: #9fb7ff;">Quick Analyze</h3>
+      <div class="card upload-quick">
+        <form id="quickForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+          <input class="file-input" id="fileInput" type="file" name="file" accept=".wav,.mp3" required />
+          <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <button type="submit" class="small-btn">🔍 Analyse</button>
+            <button type="button" class="small-btn" onclick="document.getElementById('fileInput').value='';">✖ Clear</button>
+          </div>
+          <div id="filename" style="margin-top: 8px; font-size: 0.9rem; color: #9fb7ff; display: none;"></div>
+        </form>
+      </div>
+
+      <h3 style="color: #9fb7ff; margin: 20px 0 10px;">Recent Predictions</h3>
+      <table class="recent-table card">
+        <thead><tr><th>File</th><th>Result</th><th>Time</th></tr></thead>
+        <tbody>
+          {% if recent_predictions %}
+            {% for r in recent_predictions %}
+              <tr>
+                <td>{{ r.file }}</td>
+                <td>
+                  {% if r.result == 'Phishing' %}
+                    <span class="tag-phish">⚠️ Phishing</span>
+                  {% else %}
+                    <span class="tag-good">✅ Genuine</span>
+                  {% endif %}
+                </td>
+                <td>{{ r.time }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="3" style="color: #9fb7ff;">No recent predictions</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </section>
+
+    <aside class="card">
+      <h3 style="color: #9fb7ff;">Project Summary</h3>
+      <p style="font-size: 0.9rem; color: #b3c9ff;">
+        VishingAI detects scam or deepfake voice calls using ML on audio features (MFCC, chroma, spectral contrast). 
+        Use Quick Analyze to test new samples or retrain the model for improved accuracy.
+      </p>
+      <hr>
+      <h4 style="color: #9fb7ff;">Stats</h4>
+      <p>Model: <strong>{{ model_status }}</strong></p>
+      <p>Accuracy: <strong>{{ model_accuracy ~ '%' if model_accuracy else 'N/A' }}</strong></p>
+
+      <h3 style="color: #9fb7ff; margin-top: 18px;">Model Controls</h3>
+      <div class="card" style="padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <button class="small-btn" onclick="retrainModel();">🔁 Retrain Model</button>
+        <button class="small-btn" onclick="clearDataset();">🧹 Clear Dataset</button>
+        <a style="color: #9fb7ff; font-size: 0.85rem;" href="https://github.com/prajwal-devaraj/LAW_RAW" target="_blank">View on GitHub</a>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ===== Spinner Overlay ===== -->
+  <div id="trainingOverlay">
+    <div class="spinner"></div>
+    <p style="font-size: 1.1rem;">Training Model... Please wait</p>
+  </div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const filenameDiv = document.getElementById('filename');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (f) {
+          filenameDiv.style.display = 'block';
+          filenameDiv.innerText = 'Selected: ' + f.name;
+        } else {
+          filenameDiv.style.display = 'none';
+        }
+      });
+    }
+
+    function retrainModel() {
+      const overlay = document.getElementById('trainingOverlay');
+      overlay.style.display = 'flex';
+      fetch('/retrain', { method: 'POST' })
+        .then(() => {
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            alert('✅ Model retraining complete!');
+          }, 2500);
+        })
+        .catch(() => {
+          overlay.style.display = 'none';
+          alert('❌ Error starting retrain');
+        });
+    }
+
+    function clearDataset() {
+      fetch('/clear_dataset', { method: 'POST' })
+        .then(() => alert('🧹 Dataset cleared'))
+        .catch(() => alert('❌ Error clearing dataset'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Audio - VishingAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #0a0f1d, #060912 80%);
+      color: #eaf1ff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .upload-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      box-shadow: 0 0 30px rgba(0, 100, 255, 0.25);
+      border-radius: 20px;
+      text-align: center;
+      padding: 50px 60px;
+      max-width: 520px;
+      width: 90%;
+      animation: fadeIn 0.9s ease-out;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #9fb7ff;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #b9caff;
+      margin-bottom: 30px;
+    }
+
+    /* ===== File Drop Zone ===== */
+    .drop-zone {
+      border: 2px dashed rgba(0, 153, 255, 0.5);
+      border-radius: 12px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .drop-zone:hover {
+      border-color: #00b3ff;
+      background: rgba(0, 100, 255, 0.08);
+      transform: scale(1.02);
+    }
+
+    .drop-zone input {
+      display: none;
+    }
+
+    .drop-text {
+      font-size: 1rem;
+      color: #9fb7ff;
+    }
+
+    /* ===== Buttons ===== */
+    .actions {
+      margin-top: 25px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 22px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: white;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-analyze {
+      background: #0059ff;
+    }
+
+    .btn-analyze:hover {
+      background: #007bff;
+      transform: translateY(-2px);
+    }
+
+    .btn-home {
+      background: #232e49;
+    }
+
+    .btn-home:hover {
+      background: #32456d;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="upload-card">
+    <h1>🎧 Upload Audio File</h1>
+    <p>Select or drag your audio file below to analyze it for phishing detection.</p>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <label class="drop-zone" id="dropZone">
+        <input type="file" name="file" id="fileInput" accept=".wav,.mp3" required />
+        <div class="drop-text" id="dropText">📁 Drag & Drop or Click to Upload</div>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-analyze">🔍 Analyze</button>
+        <a href="/" class="btn btn-home">🏠 Back Home</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const dropText = document.getElementById('dropText');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) dropText.innerHTML = `✅ ${file.name}`;
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#00ffaa';
+      dropZone.style.background = 'rgba(0,255,170,0.08)';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = 'rgba(0,153,255,0.5)';
+      dropZone.style.background = 'rgba(255,255,255,0.03)';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        dropText.innerHTML = `✅ ${files[0].name}`;
+      }
+      dropZone.style.borderColor = 'rgba(0,153,255,0.5)';
+      dropZone.style.background = 'rgba(255,255,255,0.03)';
+    });
+  </script>
+</body>
+</html>
